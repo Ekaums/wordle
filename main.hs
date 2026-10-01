@@ -1,3 +1,4 @@
+{- HLINT ignore "Use zipWith" -}
 import Data.Char (isAlpha)
 
 main :: IO ()
