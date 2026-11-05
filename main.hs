@@ -6,15 +6,17 @@ import Data.Map.Strict qualified as M
 
 main :: IO ()
 main = do
-  playGame
+  playGame 5
 
-playGame = do
+playGame 0 = do
+  putStrLn "YOU LOST :("
+playGame tries = do
   guess <- getGuess
   case checkGuess guess "lemon" of -- TODO: use API for getting 5 letter wordle words
     Won -> putStrLn "YOU WON!!!!!"
     Continue feedback -> do
       print feedback
-      playGame
+      playGame (tries - 1)
 
 data GuessResult = Won | Continue [Feedback]
 
@@ -28,28 +30,39 @@ checkGuess guess soln =
     then Won
     else Continue (computeFeedback guess soln)
 
--- How to correctly mark misplaced chars?
--- 1. construct a mapping b/w each char -> count
--- 2. First pass: For each char, if exact match then dec count and mark correct, else absent. Prioritize exact matches first to handle edge cases (two of same char guessed)
--- 3. Second pass: For each other char, if absent:
---        if count > 0 then
---          misplaced (still some left)
---          dec count
+{-
+Algo for computing feedback:
+  - Construct a mapping b/w each char in soln and # of occurences
+  - Two passes to compute feedback
+  First pass:
+    For each char in guess:
+      if exact match:
+        dec count and mark correct
+      else:
+        mark absent
 
+  Prioritize exact matches first to handle edge case where multiple of same char in guess
+
+  Second pass:
+    For each char in guess:
+      if marked absent and count > 0:
+         mark misplaced (not correct, but still present)
+         dec count
+-}
 computeFeedback :: String -> String -> [Feedback]
-computeFeedback guess soln = final
+computeFeedback guess soln = snd $ mapAccumL pass2Fn pass1Map (zip guess pass1Feedback)
   where
-    charCounts str = M.fromListWith (+) [(c, 1) | c <- str]
-    table = charCounts soln
+    table = M.fromListWith (+) [(c, 1) | c <- soln]
     (pass1Map, pass1Feedback) = mapAccumL pass1Fn table (zip guess soln)
-    (_, final) = mapAccumL pass2Fn pass1Map (zip guess pass1Feedback)
 
-pass1Fn table (guess_c, soln_c) = if guess_c == soln_c then (M.adjust (subtract 1) guess_c table, Correct) else (table, Absent)
+    pass1Fn table (guess_c, soln_c)
+      | guess_c == soln_c = (M.adjust (subtract 1) guess_c table, Correct)
+      | otherwise = (table, Absent)
 
-pass2Fn table (guess, feedback)
-  | feedback == Correct = (table, feedback)
-  | M.findWithDefault 0 guess table > 0 = (M.adjust (subtract 1) guess table, Misplaced)
-  | otherwise = (table, feedback)
+    pass2Fn table (guess, feedback)
+      | feedback == Correct = (table, feedback)
+      | M.findWithDefault 0 guess table > 0 = (M.adjust (subtract 1) guess table, Misplaced)
+      | otherwise = (table, feedback)
 
 getGuess :: IO String
 getGuess = do
