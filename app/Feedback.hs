@@ -1,7 +1,7 @@
 module Feedback (Feedback (..), GuessResult (..), checkGuess) where
 
 import Data.List (mapAccumL)
-import Data.Map.Strict qualified as M
+import Data.Map.Strict as M
 
 data GuessResult = Won | Continue [Feedback]
 
@@ -36,6 +36,7 @@ Algo for computing feedback:
 computeFeedback :: String -> String -> [Feedback]
 computeFeedback guess soln = snd $ mapAccumL pass2Fn pass1Map (zip guess pass1Feedback)
   where
+    table :: M.Map Char Int
     table = M.fromListWith (+) [(c, 1) | c <- soln]
     (pass1Map, pass1Feedback) = mapAccumL pass1Fn table (zip guess soln)
 

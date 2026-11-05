@@ -1,10 +1,12 @@
 {- HLINT ignore "Use zipWith" -}
 
-import Feedback (Feedback (..), GuessResult (..), checkGuess)
+import Feedback (GuessResult (..), checkGuess)
+import System.IO (hSetBuffering, stdout, BufferMode(..))
 import Validate (getGuess)
 
 main :: IO ()
 main = do
+  hSetBuffering stdout NoBuffering
   playGame 5
 
 playGame :: Int -> IO ()
