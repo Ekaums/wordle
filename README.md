@@ -6,3 +6,4 @@
 - Mark letters as valid, invalid, misplaced
 - Only 5 guesses allowed. Win/lose 
 - Used letters tracker
+- Can't move around when typing in terminal?
