@@ -5,11 +5,11 @@
 import Data.Aeson (FromJSON)
 import Feedback (GuessResult (..), checkGuess)
 import GHC.Generics (Generic)
-import Network.HTTP.Simple (getResponseBody, httpJSON, parseRequest)
+import Network.HTTP.Simple (Response, getResponseBody, httpJSON, parseRequest)
 import System.IO (BufferMode (..), hSetBuffering, stdout)
 import Validate (getGuess)
 
-data WordResponse = WordResponse {word :: String} deriving (Generic)
+newtype WordResponse = WordResponse {word :: String} deriving (Generic)
 
 instance FromJSON WordResponse
 
@@ -22,8 +22,8 @@ main = do
 fetchRandomWord :: IO String
 fetchRandomWord = do
   request <- parseRequest "https://words.dev-apis.com/word-of-the-day?random=1"
-  response <- httpJSON request
-  return (word (getResponseBody response))
+  response <- httpJSON request :: IO (Response WordResponse) -- Assert that return json can be converted to this type. In other words, it has the fields needed to construct this type
+  return (word (getResponseBody response)) -- Request returns json in form {word : "word"}. We just have to make sure our data type matches the fields we want
 
 playGame :: String -> Int -> IO ()
 playGame soln 0 = putStrLn ("YOU LOST :( The word was " ++ soln)
