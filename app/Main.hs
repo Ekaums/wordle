@@ -26,7 +26,7 @@ fetchRandomWord = do
   return (word (getResponseBody response)) -- Request returns json in form {word : "word"}. We just have to make sure our data type matches the fields we want
 
 playGame :: String -> Int -> IO ()
-playGame soln 0 = putStrLn ("YOU LOST :( The word was " ++ soln)
+playGame soln 0 = putStrLn ("YOU LOST :(\nThe word was " ++ soln)
 playGame soln tries = do
   guess <- getGuess
   case checkGuess guess soln of
