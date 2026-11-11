@@ -1,10 +1,17 @@
-# wordle
+# Wordle
 
-## Program-level requirements
-- Gracefully handle errors if APIs fail ✅
+Wordle in the terminal, built in Haskell.
 
-## User-level requirements
-- Can start a game, and each game has a new word ✅
-- Input validation. Only 5 letter words allowed, and they must be actual words ✅
-- Only 5 guesses allowed. Win/lose ✅
-- Mark letters as valid, invalid, misplaced. Use emojis to display ✅
+## Run
+
+```bash
+cabal build
+cabal run
+```
+
+## Features
+
+- Random 5-letter word each time
+- Word validation against real English words
+- Emoji feedback (🟩 🟨 ⬛)
+- 5 guesses to win
