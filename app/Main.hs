@@ -4,7 +4,7 @@
 
 import Control.Exception (SomeException, try)
 import Data.Aeson (FromJSON)
-import Feedback (GuessResult (..), checkGuess)
+import Feedback (GuessResult (..), checkGuess, printFeedback)
 import GHC.Generics (Generic)
 import Network.HTTP.Simple (Response, getResponseBody, httpJSON, parseRequest)
 import System.IO (BufferMode (..), hSetBuffering, stdout)
@@ -31,9 +31,10 @@ fetchRandomWord = try $ do
 playGame :: String -> Int -> IO ()
 playGame soln 0 = putStrLn ("YOU LOST :(\nThe word was " ++ soln)
 playGame soln tries = do
+  putStr ("Guess #" ++ show (6 - tries) ++ ": ")
   guess <- getGuess
   case checkGuess guess soln of
     Won -> putStrLn "YOU WON!!!!!"
     Continue feedback -> do
-      print feedback
+      printFeedback feedback
       playGame soln (tries - 1)

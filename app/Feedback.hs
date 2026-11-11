@@ -1,4 +1,4 @@
-module Feedback (Feedback (..), GuessResult (..), checkGuess) where
+module Feedback (Feedback (..), GuessResult (..), checkGuess, printFeedback) where
 
 import Data.List (mapAccumL)
 import Data.Map.Strict as M
@@ -48,3 +48,11 @@ computeFeedback guess soln = snd $ mapAccumL pass2Fn pass1Map (zip guess pass1Fe
       | f == Correct = (t, f)
       | M.findWithDefault 0 g t > 0 = (M.adjust (subtract 1) g t, Misplaced)
       | otherwise = (t, f)
+
+printFeedback :: [Feedback] -> IO ()
+printFeedback feedback = putStrLn $ concatMap toEmoji feedback
+
+toEmoji :: Feedback -> String
+toEmoji Correct = "🟩"
+toEmoji Misplaced = "🟨"
+toEmoji Absent = "⬛"

@@ -17,7 +17,6 @@ instance FromJSON ValidWord
 
 getGuess :: IO String
 getGuess = do
-  putStr "Guess: "
   val <- getLine
   result <- validateInput val
   case result of
