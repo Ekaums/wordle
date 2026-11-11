@@ -18,6 +18,7 @@ checkGuess guess soln =
 Algo for computing feedback:
   - Construct a mapping b/w each char in soln and # of occurences
   - Two passes to compute feedback
+
   First pass:
     For each char in guess:
       if exact match:

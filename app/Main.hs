@@ -22,12 +22,6 @@ main = do
     Left _ -> putStrLn "API for retreiving word failed!"
     Right s -> playGame s 5
 
-fetchRandomWord :: IO (Either SomeException String)
-fetchRandomWord = try $ do
-  request <- parseRequest "https://words.dev-apis.com/word-of-the-day?random=1"
-  response <- httpJSON request :: IO (Response WordResponse) -- Assert that return json can be converted to this type. In other words, it has the fields needed to construct this type
-  return (word (getResponseBody response)) -- Request returns json in form {word : "word"}. We just have to make sure our data type matches the fields we want
-
 playGame :: String -> Int -> IO ()
 playGame soln 0 = putStrLn ("YOU LOST :(\nThe word was " ++ soln)
 playGame soln tries = do
@@ -38,3 +32,9 @@ playGame soln tries = do
     Continue feedback -> do
       printFeedback feedback
       playGame soln (tries - 1)
+
+fetchRandomWord :: IO (Either SomeException String)
+fetchRandomWord = try $ do
+  request <- parseRequest "https://words.dev-apis.com/word-of-the-day?random=1"
+  response <- httpJSON request :: IO (Response WordResponse) -- Assert that return json can be converted to this type. In other words, it has the fields needed to construct this type
+  return (word (getResponseBody response)) -- Request returns json in form {word : "word"}. We just have to make sure our data type matches the fields we want
