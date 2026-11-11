@@ -2,6 +2,7 @@
 
 {- HLINT ignore "Use zipWith" -}
 
+import Control.Exception (SomeException, try)
 import Data.Aeson (FromJSON)
 import Feedback (GuessResult (..), checkGuess)
 import GHC.Generics (Generic)
@@ -17,10 +18,12 @@ main :: IO ()
 main = do
   hSetBuffering stdout NoBuffering
   soln <- fetchRandomWord
-  playGame soln 5
+  case soln of
+    Left _ -> putStrLn "API for retreiving word failed!"
+    Right s -> playGame s 5
 
-fetchRandomWord :: IO String
-fetchRandomWord = do
+fetchRandomWord :: IO (Either SomeException String)
+fetchRandomWord = try $ do
   request <- parseRequest "https://words.dev-apis.com/word-of-the-day?random=1"
   response <- httpJSON request :: IO (Response WordResponse) -- Assert that return json can be converted to this type. In other words, it has the fields needed to construct this type
   return (word (getResponseBody response)) -- Request returns json in form {word : "word"}. We just have to make sure our data type matches the fields we want
